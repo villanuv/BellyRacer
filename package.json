@@ -1,0 +1,17 @@
+{
+    "name": "SocketioExample",
+    "version": "0.0.1",
+    "description": "SocketIO Math Game",
+    "scripts": {
+      "start": "nodemon index.js"
+    },
+    "dependencies": {
+        "socket.io": "latest",
+        "moniker": "latest",
+        "Faker": "latest"
+    },
+    "devDependencies": {
+    "nodemon": "*"
+    },
+    "author": "Patrick Villanueva"
+}

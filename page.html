@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/2.0.0/knockout-min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+        var welcome = $('#welcome')[0];
+        var allUsers = $('#users')[0];
+        var operations = $('#operations')[0];
+        var results = $('#results')[0];
+
+        var socket = io.connect('http://localhost:3250');
+
+        socket.on('welcome', function(data) {
+          welcome.innerHTML = "Welcome to BellyRacer! Faker name given: <strong>" + data.name + "</strong>";
+          var selector = "tr." + data.name + " td:first-child";
+          $(selector).css('font-weight', 'bold');
+        });
+
+        socket.on('users', function(data) {
+          allUsers.innerHTML = data.users;
+        });
+
+        // part of new game
+        socket.on('new_operation', function(data) {
+          operations.innerHTML = data;
+          $('input.input_player').val('').select();
+        });
+
+        socket.on('enable', function(data) {
+          $('input.input_player').removeAttr(data.state);
+        });
+
+        socket.on('disable', function(data) {
+          $('input.input_player').attr('disabled', data.state);
+        });
+
+        socket.on('win', function(data) {
+          results.innerHTML = data.message;
+          var selector1 = "tr." + data.winner + " td:first-child";
+          var selector2 = "tr." + data.winner + " td.wins small span";
+          $(selector1).css('font-weight', 'bold');
+          $(selector2).css('background-color', 'green');
+        });
+
+        function Countdown() {
+          for(i=1; i<6; i++) {
+            return i;
+          }
+        }
+
+        //knockout model and binding
+        function Race() {
+          var self = this;
+
+          self.input_player1 = ko.observable();
+
+          self.sendOperationResult = function() {
+            var data = { operation: self.input_player1() };
+            var dataInput = $('input.input_player').val().trim();
+            if (dataInput != "") {
+              socket.emit('solve_operation', data);
+            }
+          };
+        }
+
+        var race = new Race();
+        ko.applyBindings(race);
+        //end knockout model and binding
+
+        //jQuery bindings
+        $('input.input_player').click(function(e){
+          this.select();  
+        });
+
+        $('input.input_player').keydown(function(e){
+          if (e.keyCode=='13'){ //press return
+            race.sendOperationResult();
+            $('input.input_player').select();
+          }
+        });
+
+      });
+
+    </script>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,300,700" rel="stylesheet">
+    <style type="text/css">
+      html, body {
+        margin: 0;
+        font-family: 'Open Sans', 'Myriad Pro', 'Lucida Grande', Verdana, Arial,sans-serif;
+        font-size: 14px;
+        color: #333331;
+      }
+
+      #topnav {
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        height: 80px;
+      }
+
+      #logo {
+        display: block;
+        float: left;
+        background: url('/logo.jpg') 0 15px no-repeat;
+        background-repeat: no-repeat;
+        width: 139px;
+        height: 62px;
+      }
+
+      #welcome {
+        float: right;
+        font-size: 12px;
+        line-height: 80px;
+        height: 80px;
+        vertical-align: middle;    
+      }
+
+      #topnav, #container {
+        display: block;
+        margin: 0 auto;
+        width: 800px;
+      }
+
+      #math {
+        clear: both;
+        width: 100%;
+        background-color: #33A9E0;
+        color: #fff;
+        padding: 40px 0 50px;
+        font-weight: 600;
+      }
+
+      #math, .input_player {
+        text-align: center;
+        font-size: 60px;
+        font-family: 'Open Sans', 'Myriad Pro', 'Lucida Grande', Verdana, Arial,sans-serif;
+      }
+
+      .input_player {
+        border-radius: 10px;
+        border: 1px #fff solid;
+        background-color: #33A9E0;
+        color: #fff;
+        font-weight: 600;
+        outline: none; /* removes input box glow */
+      }
+
+      .race {
+        width: 30px;
+        height: 26px;
+        background: url('/logo.gif') 0 0 no-repeat;
+        background-size: contain;
+      }
+
+      #results {
+        text-align: center;
+        font-size: 18px;
+        padding-top: 40px;
+      }
+
+      footer {
+        position: fixed;
+        float: left;
+        bottom: 0;
+        color: #fff;
+        padding: 20px 0;
+        width: 100%;
+        background-color: #444;
+      }
+
+      footer div {
+        width: 800px;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        margin: 0 auto;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      footer a:link,
+      footer a:active,
+      footer a:visited {
+        color: #fff;
+        text-decoration: none;
+        border-bottom: 1px #fff dotted;
+      }
+
+      h1 {
+        font-weight: 400;
+        font-size: 48px;
+      }
+
+      tr:first-child {
+        height: 40px;
+        background-color: #F6F6F6;
+        color: #424241;
+      }
+
+      tr:first-child td {
+        font-weight: bold;
+      }
+
+      tr td:first-child {
+        padding-left: 10px;
+      }
+
+      tr:first-child td:nth-child(2) {
+        background: none;
+      }
+
+      tr td:nth-child(2) {
+        background: url('/track.jpg') 116px 0 repeat-x;
+      }
+
+      td {
+        height: 30px;
+      }
+
+      td.pts, td.wins {
+        text-align: center;
+      }
+
+      td.wins {
+        font-weight: bold;
+      }
+
+      td small span {
+        background-color: #33A9E0;
+        color: #fff;
+        padding: 2px 12px;
+        border-radius: 8px;
+      }
+
+      td.pts small span {
+        background-color: #444;
+      }
+
+      input {
+        width: 130px;
+        padding: 5px 10px;
+      }
+
+      meter {
+        width: 500px;
+        height: 25px;
+      }
+
+      .clear {
+        clear: both;
+      }
+    </style>
+
+    <title>BellyRacer: A Math Game</title>
+  </head>
+  <body>
+    <header id="topnav">
+      <div id="logo"></div>
+      <div id="welcome"></div>
+      <div class="clear"></div>
+    </header>
+
+    <div id="math">
+      <h1>What is...</h1>
+      <span id="operations"></span> <span class="equal">=</span>
+      <input class="input_player" maxlength="4" type="text" name="player1" value="" data-bind="value: input_player1, valueUpdate: 'afterkeydown'" />
+      <div id="results">Who will win BellyRacer?</div>
+    </div>
+    <div id="container">
+    <div id="users"></div>
+    </div>
+
+    <footer><div>
+      Created by <a href="http://j.mp/villanuv_home" target="_blank">Patrick Villanueva</a>, April 2014 | <a href="http://j.mp/villanuv_twitter" target="_blank">Say Hello</a></div>
+    </footer>
+  </body>
+</html>
