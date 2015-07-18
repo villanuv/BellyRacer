@@ -13,5 +13,8 @@
     "devDependencies": {
     "nodemon": "*"
     },
-    "author": "Patrick Villanueva"
+    "author": "Patrick Villanueva",
+    "engines": {
+        "node": "v0.10.26"
+    }
 }
