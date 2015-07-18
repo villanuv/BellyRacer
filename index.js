@@ -40,7 +40,7 @@ var app = require('http').createServer(handler);
 var io = require('socket.io').listen(app);
 var fs = require('fs');
 var Faker = require('Faker');
-var port = 3250;
+var port = process.env.PORT || 3250;
 
 app.listen(port);
 
