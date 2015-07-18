@@ -2,9 +2,9 @@
     "name": "SocketioExample",
     "version": "0.0.1",
     "description": "SocketIO Math Game",
-    "scripts": {
-      "start": "node index.js"
-    },
+    // "scripts": {
+    //   "start": "node index.js"
+    // },
     "dependencies": {
         "socket.io": "latest",
         "moniker": "latest",
