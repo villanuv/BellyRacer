@@ -10,9 +10,6 @@
         "moniker": "latest",
         "Faker": "latest"
     },
-    "devDependencies": {
-    "nodemon": "*"
-    },
     "author": "Patrick Villanueva",
     "engines": {
         "node": "v0.10.26"
